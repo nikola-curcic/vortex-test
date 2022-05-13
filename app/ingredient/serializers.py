@@ -3,4 +3,7 @@ from core.models import Ingredient
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    name = serializers.CharField()
+
+    class Meta:
+        model = Ingredient
+        fields = '__all__'

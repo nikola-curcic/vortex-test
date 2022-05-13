@@ -1,13 +1,13 @@
 from django.urls import path
-from ingredient import views
+from recipe import views
 
-app_name = 'ingredient'
+app_name = 'recipe'
 
 urlpatterns = [
     path('',
          views.ListIngredients.as_view(),
-         name='ingredients'),
+         name='recipes'),
     path('<int:id>',
-         views.IngredientDetails.as_view(),
+         views.RecipeDetails.as_view(),
          name='ingredients')
 ]

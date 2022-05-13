@@ -3,20 +3,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 
-from core.models import Ingredient
-from ingredient.serializers import IngredientSerializer
+from core.models import Recipe
+from recipe.serializers import RecipeSerializer
 
 
 class ListIngredients(ListAPIView):
-    """Post one and get the list of all ingredients"""
-    serializer_class = IngredientSerializer
-    queryset = Ingredient.objects.get_queryset()
+    """Post one and get the list of all recipes"""
+    serializer_class = RecipeSerializer
+    queryset = Recipe.objects.get_queryset()
 
     def get_queryset(self):
         return self.queryset.all()
 
     def post(self, request):
-        serializer = IngredientSerializer(data=request.data)
+        serializer = RecipeSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -27,18 +27,18 @@ class ListIngredients(ListAPIView):
                             status.HTTP_400_BAD_REQUEST)
 
 
-class IngredientDetails(APIView):
+class RecipeDetails(APIView):
 
     def get(self, request, id):
         try:
-            ingredient = Ingredient.objects.get(id=id)
-            if ingredient:
-                serializer = IngredientSerializer(instance=ingredient)
+            recipe = Recipe.objects.get(id=id)
+            if recipe:
+                serializer = RecipeSerializer(instance=recipe)
                 return Response(serializer.data, status.HTTP_200_OK)
-        except Ingredient.DoesNotExist:
+        except Recipe.DoesNotExist:
             return Response({'errors': {'not_found': ['object does not exist']}},
                             status.HTTP_400_BAD_REQUEST)
 
-# updating ingredient not allowed
+# updating recipe not allowed
 
-# deleting ingredient not allowed
+# deleting recipe not allowed
