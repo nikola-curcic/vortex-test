@@ -1,4 +1,6 @@
 from rest_framework.generics import ListAPIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -11,6 +13,8 @@ class ListIngredients(ListAPIView):
     """Post one and get the list of all ingredients"""
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.get_queryset()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return self.queryset.all()
@@ -28,6 +32,9 @@ class ListIngredients(ListAPIView):
 
 
 class IngredientDetails(APIView):
+    """Get ingredient details"""
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, id):
         try:
