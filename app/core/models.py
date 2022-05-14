@@ -49,6 +49,8 @@ class Recipe(models.Model):
     average_rating = models.DecimalField(max_digits=5,
                                          decimal_places=2,
                                          default=0)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             null=True)
 
 
