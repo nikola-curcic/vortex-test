@@ -52,5 +52,7 @@ class Recipe(models.Model):
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=True)
-
+    num_of_ratings=models.IntegerField(default=0)
+    total_rating=models.IntegerField(default=0)
+    ingredients=models.ManyToManyField(Ingredient)
 

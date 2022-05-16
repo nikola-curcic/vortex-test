@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.models import Recipe
-from recipe.serializers import RecipeSerializer
+from recipe.serializers import RecipeSerializer, RatingSerializer
 
 
 class ListRecipe(ListAPIView):
@@ -50,10 +50,47 @@ class RecipeDetails(APIView):
 
 # deleting recipe not allowed
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def list_own_recepies(request):
+def list_own_recipes(request):
     """List own recepies"""
     own_recipes = list(Recipe.objects.filter(user=request.user))
     serializer = RecipeSerializer(own_recipes, many=True)
     return Response(serializer.data, status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def rate_recipe(request, id):
+    """Rate recipes"""
+    try:
+        recipe = Recipe.objects.get(id=id)
+
+        if recipe.user == request.user:
+            return Response ({'errors': 'cannot rate your own recipe'},
+                        status.HTTP_400_BAD_REQUEST)
+
+        serializer = RatingSerializer(data=request.data)
+        if serializer.is_valid():
+            num_of_ratings = recipe.num_of_ratings + 1
+            total_rating = recipe.total_rating + request.data.get('rating')
+            average_rating = total_rating/num_of_ratings
+            recipe.total_rating = total_rating
+            recipe.average_rating = average_rating
+            recipe.num_of_ratings = num_of_ratings
+            recipe.save()
+            return Response({'message': 'recipe succesfully rated'}, status.HTTP_200_OK)
+        else:
+            return Response({'errors':
+                             'rating not present or not integer between 1 and 5'},
+                              status.HTTP_400_BAD_REQUEST)
+
+    except Recipe.DoesNotExist:
+        return Response({'errors': {'not_found': ['object does not exist']}},
+                        status.HTTP_400_BAD_REQUEST)
+
+
+
+
+

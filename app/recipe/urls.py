@@ -10,7 +10,10 @@ urlpatterns = [
     path('<int:id>',
          views.RecipeDetails.as_view(),
          name='ingredients'),
-    path('list-own-recepies',
-         views.list_own_recepies,
-         name='list_own_recepies')
+    path('list-own-recipes',
+         views.list_own_recipes,
+         name='list_own_recipes'),
+    path('rate-recipe/<int:id>',
+         views.rate_recipe,
+         name='rate_recipe')
 ]
