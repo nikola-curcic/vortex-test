@@ -1,7 +1,5 @@
 import json
 
-from django.db import connection
-
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import ListAPIView
@@ -9,18 +7,22 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Ingredient
+from ingredient.repository import (
+                                    list_ingredients_db,
+                                    get_ingredient_db,
+                                    query_most_used_ingredients_db
+
+)
 from ingredient.serializers import IngredientSerializer
 
 
 class ListIngredients(ListAPIView):
     """Post one and get the list of all ingredients"""
     serializer_class = IngredientSerializer
-    queryset = Ingredient.objects.get_queryset()
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return self.queryset.all()
+        return list_ingredients_db()
 
     def post(self, request):
         serializer = IngredientSerializer(data=request.data)
@@ -40,7 +42,7 @@ class IngredientDetails(APIView):
 
     def get(self, request, id):
         try:
-            ingredient = Ingredient.objects.get(id=id)
+            ingredient = get_ingredient_db(id)
             if ingredient:
                 serializer = IngredientSerializer(instance=ingredient)
                 return Response(serializer.data, status.HTTP_200_OK)
@@ -57,18 +59,5 @@ class IngredientDetails(APIView):
 @permission_classes([IsAuthenticated])
 def list_most_used_ingredients(request):
     """List most used ingredients"""
-    with connection.cursor() as cursor:
-        cursor.execute(
-            'SELECT ci.name, COUNT(*) AS number '
-            'FROM core_recipe_ingredients crp '
-            'LEFT JOIN core_ingredient ci '
-            'ON ci.id = crp.ingredient_id '
-            'GROUP BY ci.name '
-            'ORDER BY number DESC '
-            'LIMIT 5'
-        )
-        data = cursor.fetchall()
-
-        ingredients = [{'name': d[0], 'number_of_recipes': d[1]} for d in data]
-
+    ingredients = query_most_used_ingredients_db()
     return Response( {'most used ingredients': ingredients}, status.HTTP_200_OK)

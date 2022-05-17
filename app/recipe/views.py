@@ -7,18 +7,23 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Recipe
+from recipe.repository import (
+                                list_recipes_db,
+                                get_recipe_db,
+                                list_own_recipes_db,
+                                rate_recipe_db
+)
+
 from recipe.serializers import RecipeSerializer, RatingSerializer
 
 
 class ListRecipe(ListAPIView):
     """Post one and get the list of all recipes"""
     serializer_class = RecipeSerializer
-    queryset = Recipe.objects.get_queryset()
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return self.queryset.all()
+        return list_recipes_db()
 
     def post(self, request):
         serializer = RecipeSerializer(data=request.data)
@@ -38,7 +43,7 @@ class RecipeDetails(APIView):
 
     def get(self, request, id):
         try:
-            recipe = Recipe.objects.get(id=id)
+            recipe = get_recipe_db(id)
             if recipe:
                 serializer = RecipeSerializer(instance=recipe)
                 return Response(serializer.data, status.HTTP_200_OK)
@@ -55,7 +60,7 @@ class RecipeDetails(APIView):
 @permission_classes([IsAuthenticated])
 def list_own_recipes(request):
     """List own recipes"""
-    own_recipes = list(Recipe.objects.filter(user=request.user))
+    own_recipes = list_own_recipes_db(request.user)
     serializer = RecipeSerializer(own_recipes, many=True)
     return Response(serializer.data, status.HTTP_200_OK)
 
@@ -67,7 +72,7 @@ def rate_recipe(request, id):
     recipe = None
 
     try:
-        recipe = Recipe.objects.get(id=id)
+        recipe = get_recipe_db(id)
     except Recipe.DoesNotExist:
         return Response({'errors': {'not_found': ['object does not exist']}},
                         status.HTTP_400_BAD_REQUEST)
@@ -83,14 +88,9 @@ def rate_recipe(request, id):
                          'rating not present or not integer between 1 and 5'},
                           status.HTTP_400_BAD_REQUEST)
 
-    num_of_ratings = recipe.num_of_ratings + 1
-    total_rating = recipe.total_rating + request.data.get('rating')
-    average_rating = total_rating/num_of_ratings
-    recipe.total_rating = total_rating
-    recipe.average_rating = average_rating
-    recipe.num_of_ratings = num_of_ratings
-    recipe.save()
-    return Response({'message': 'recipe successfully rated'}, status.HTTP_200_OK)
+    recipe_id = rate_recipe_db(recipe, request.data.get('rating'))
+    resp = 'recipe {0} successfully rated'.format(recipe_id)
+    return Response({'message': resp}, status.HTTP_200_OK)
 
 
 
