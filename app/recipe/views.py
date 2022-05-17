@@ -54,7 +54,7 @@ class RecipeDetails(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_own_recipes(request):
-    """List own recepies"""
+    """List own recipes"""
     own_recipes = list(Recipe.objects.filter(user=request.user))
     serializer = RecipeSerializer(own_recipes, many=True)
     return Response(serializer.data, status.HTTP_200_OK)
@@ -90,7 +90,7 @@ def rate_recipe(request, id):
     recipe.average_rating = average_rating
     recipe.num_of_ratings = num_of_ratings
     recipe.save()
-    return Response({'message': 'recipe succesfully rated'}, status.HTTP_200_OK)
+    return Response({'message': 'recipe successfully rated'}, status.HTTP_200_OK)
 
 
 
