@@ -64,31 +64,37 @@ def list_own_recipes(request):
 @permission_classes([IsAuthenticated])
 def rate_recipe(request, id):
     """Rate recipes"""
+    recipe = None
+
     try:
         recipe = Recipe.objects.get(id=id)
-
-        if recipe.user == request.user:
-            return Response ({'errors': 'cannot rate your own recipe'},
-                        status.HTTP_400_BAD_REQUEST)
-
-        serializer = RatingSerializer(data=request.data)
-        if serializer.is_valid():
-            num_of_ratings = recipe.num_of_ratings + 1
-            total_rating = recipe.total_rating + request.data.get('rating')
-            average_rating = total_rating/num_of_ratings
-            recipe.total_rating = total_rating
-            recipe.average_rating = average_rating
-            recipe.num_of_ratings = num_of_ratings
-            recipe.save()
-            return Response({'message': 'recipe succesfully rated'}, status.HTTP_200_OK)
-        else:
-            return Response({'errors':
-                             'rating not present or not integer between 1 and 5'},
-                              status.HTTP_400_BAD_REQUEST)
-
     except Recipe.DoesNotExist:
         return Response({'errors': {'not_found': ['object does not exist']}},
                         status.HTTP_400_BAD_REQUEST)
+
+    if recipe.user == request.user:
+        return Response ({'errors': 'cannot rate your own recipe'},
+                        status.HTTP_400_BAD_REQUEST)
+
+    serializer = RatingSerializer(data=request.data)
+
+    if not serializer.is_valid():
+        return Response({'errors':
+                         'rating not present or not integer between 1 and 5'},
+                          status.HTTP_400_BAD_REQUEST)
+
+    num_of_ratings = recipe.num_of_ratings + 1
+    total_rating = recipe.total_rating + request.data.get('rating')
+    average_rating = total_rating/num_of_ratings
+    recipe.total_rating = total_rating
+    recipe.average_rating = average_rating
+    recipe.num_of_ratings = num_of_ratings
+    recipe.save()
+    return Response({'message': 'recipe succesfully rated'}, status.HTTP_200_OK)
+
+
+
+
 
 
 
