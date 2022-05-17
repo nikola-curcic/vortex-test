@@ -9,5 +9,8 @@ urlpatterns = [
          name='ingredients'),
     path('<int:id>',
          views.IngredientDetails.as_view(),
-         name='ingredients')
+         name='ingredients'),
+    path('list-most-used-ingredients/',
+         views.list_most_used_ingredients,
+         name='list_most_used_ingredients')
 ]
