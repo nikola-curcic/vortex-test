@@ -5,7 +5,6 @@ import requests
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers, status
 
-
 logger = logging.getLogger(__name__)
 
 
