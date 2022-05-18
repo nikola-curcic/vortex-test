@@ -11,7 +11,8 @@ from recipe.repository import (
                                 list_recipes_db,
                                 get_recipe_db,
                                 list_own_recipes_db,
-                                rate_recipe_db
+                                rate_recipe_db,
+                                list_recipes_max_min_ingredients
 )
 
 from recipe.serializers import RecipeSerializer, RatingSerializer
@@ -23,13 +24,23 @@ class ListRecipe(ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
+
+        maxingredient = self.request.query_params.get('maxingredient')
+        miningredient = self.request.query_params.get('miningredient')
+
+        # in case maxingredient and miningredient in queryparams filter recipes
+        # which have between or equal number of ingredients
+        if maxingredient and miningredient:
+            return list_recipes_max_min_ingredients(maxingredient, miningredient)
+
         return list_recipes_db()
 
     def post(self, request):
         serializer = RecipeSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save(user=request.user,
+                            num_of_ingredients=len(request.data.get('ingredients')))
             return Response({'object': serializer.data},
                             status.HTTP_201_CREATED)
         else:

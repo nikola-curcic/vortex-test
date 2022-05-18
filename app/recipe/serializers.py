@@ -6,8 +6,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        exclude = ('num_of_ratings', 'total_rating', 'user')
-        read_only_fields = ('average_rating', 'num_of_ratings', 'total_rating')
+        exclude = ('num_of_ratings', 'total_rating', 'user', 'num_of_ingredients')
+        read_only_fields = ('average_rating', 'num_of_ratings', 'total_rating', 'num_of_ingredients')
 
 
 def valid_rating(value):

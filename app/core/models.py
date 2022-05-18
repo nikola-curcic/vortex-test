@@ -76,4 +76,5 @@ class Recipe(models.Model):
     num_of_ratings=models.IntegerField(default=0)
     total_rating=models.IntegerField(default=0)
     ingredients=models.ManyToManyField(Ingredient)
+    num_of_ingredients=models.IntegerField(default=0)
 

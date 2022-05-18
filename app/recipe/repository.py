@@ -30,3 +30,10 @@ def rate_recipe_db(recipe, rating):
     recipe.num_of_ratings = num_of_ratings
     recipe.save()
     return recipe.id
+
+
+def list_recipes_max_min_ingredients(max, min):
+    logger.info('Listing recipes with max and min number of ingredients...')
+    recipes = Recipe.objects.filter(num_of_ingredients__lte=max,
+                                    num_of_ingredients__gte=min)
+    return recipes
