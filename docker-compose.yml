@@ -17,6 +17,8 @@ services:
       - DB_PASS=test123pass
       # SECRET_KEY should be secret
       - SECRET_KEY=73$sfzww$s#&*xbh6h94dj1ca+%e0dpwp)y!j0ne0pp$a
+      # you should generate your own HUNTER_API_KEY
+      - HUNTER_API_KEY=b7130e673f91b887a54e1a2a88891702717387ca
     depends_on:
       - db
   db:

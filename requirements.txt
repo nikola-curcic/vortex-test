@@ -3,3 +3,4 @@ djangorestframework==3.10.3
 Markdown==3.3.4
 psycopg2>=2.7.5,<2.8.0
 djangorestframework_simplejwt==4.6.0
+requests==2.27.1
