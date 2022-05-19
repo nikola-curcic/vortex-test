@@ -14,9 +14,7 @@ from recipe.repository import (
                                 list_own_recipes_db,
                                 rate_recipe_db,
                                 list_recipes_max_min_ingredients_db,
-                                list_recipes_name_db,
-                                list_recipes_text_db,
-                                list_recipes_ingredients_db
+                                list_recipes_name_text_ingredients_db,
 )
 
 from recipe.serializers import RecipeSerializer, RatingSerializer
@@ -29,17 +27,9 @@ class ListRecipe(ListAPIView):
 
     def get_queryset(self):
 
-        if self.request.query_params.get('name'):
-            name = self.request.query_params.get('name')
-            return list_recipes_name_db(name)
-
-        if self.request.query_params.get('text'):
-            text = self.request.query_params.get('text')
-            return list_recipes_text_db(text)
-
-        if self.request.query_params.get('ingredients'):
-            ingredients = self.request.query_params.get('ingredients').split(',')
-            return list_recipes_ingredients_db(ingredients)
+        if self.request.query_params.get('search'):
+            search = self.request.query_params.get('search')
+            return list_recipes_name_text_ingredients_db(search)
 
         # in case maxingredient and miningredient in queryparams filter recipes
         # which have between or equal number of ingredients

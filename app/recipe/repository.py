@@ -34,14 +34,11 @@ def rate_recipe_db(recipe, rating):
     return recipe.id
 
 
-def list_recipes_name_db(name):
-    logger.info('Filtering recipes by name...')
-    return Recipe.objects.filter(name__contains=name)
-
-
-def list_recipes_text_db(text):
-    logger.info('Filtering recipes by text...')
-    return Recipe.objects.filter(text__contains=text)
+def list_recipes_name_text_ingredients_db(search):
+    logger.info('Filtering recipes by search...')
+    return Recipe.objects.filter(name__contains=search) | \
+           Recipe.objects.filter(text__contains=search) | \
+           Recipe.objects.filter(ingredients__name__contains=search)
 
 
 def list_recipes_ingredients_db(ingredients):
