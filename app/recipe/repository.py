@@ -1,5 +1,7 @@
 import logging
 
+from django.db.models import Count
+
 from core.models import Recipe
 
 logger = logging.getLogger(__name__)
@@ -32,8 +34,25 @@ def rate_recipe_db(recipe, rating):
     return recipe.id
 
 
-def list_recipes_max_min_ingredients(max, min):
-    logger.info('Listing recipes with max and min number of ingredients...')
-    recipes = Recipe.objects.filter(num_of_ingredients__lte=max,
-                                    num_of_ingredients__gte=min)
-    return recipes
+def list_recipes_name_db(name):
+    logger.info('Filtering recipes by name...')
+    return Recipe.objects.filter(name__contains=name)
+
+
+def list_recipes_text_db(text):
+    logger.info('Filtering recipes by text...')
+    return Recipe.objects.filter(text__contains=text)
+
+
+def list_recipes_ingredients_db(ingredients):
+    logger.info('Filtering recipes by ingredients...')
+
+    return Recipe.objects.filter(ingredients__in=ingredients).\
+            annotate(num_ingredients=Count('ingredients'))\
+            .filter(num_ingredients=len(ingredients))
+
+
+def list_recipes_max_min_ingredients_db(max, min):
+    logger.info('Filtering recipes with max and min number of ingredients...')
+    return Recipe.objects.filter(num_of_ingredients__lte=max,
+                                 num_of_ingredients__gte=min)

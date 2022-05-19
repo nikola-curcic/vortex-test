@@ -1,4 +1,5 @@
 from django.core import serializers
+from django.db.models import Count
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -12,7 +13,10 @@ from recipe.repository import (
                                 get_recipe_db,
                                 list_own_recipes_db,
                                 rate_recipe_db,
-                                list_recipes_max_min_ingredients
+                                list_recipes_max_min_ingredients_db,
+                                list_recipes_name_db,
+                                list_recipes_text_db,
+                                list_recipes_ingredients_db
 )
 
 from recipe.serializers import RecipeSerializer, RatingSerializer
@@ -25,13 +29,25 @@ class ListRecipe(ListAPIView):
 
     def get_queryset(self):
 
-        maxingredient = self.request.query_params.get('maxingredient')
-        miningredient = self.request.query_params.get('miningredient')
+        if self.request.query_params.get('name'):
+            name = self.request.query_params.get('name')
+            return list_recipes_name_db(name)
+
+        if self.request.query_params.get('text'):
+            text = self.request.query_params.get('text')
+            return list_recipes_text_db(text)
+
+        if self.request.query_params.get('ingredients'):
+            ingredients = self.request.query_params.get('ingredients').split(',')
+            return list_recipes_ingredients_db(ingredients)
 
         # in case maxingredient and miningredient in queryparams filter recipes
         # which have between or equal number of ingredients
-        if maxingredient and miningredient:
-            return list_recipes_max_min_ingredients(maxingredient, miningredient)
+        if self.request.query_params.get('maxingredient') and \
+                self.request.query_params.get('miningredient'):
+            maxingredient = self.request.query_params.get('maxingredient')
+            miningredient = self.request.query_params.get('miningredient')
+            return list_recipes_max_min_ingredients_db(maxingredient, miningredient)
 
         return list_recipes_db()
 
