@@ -1,9 +1,9 @@
 import logging
-import os
 import requests
 
+from core.repository import check_email_valid
 from django.contrib.auth import get_user_model, authenticate
-from rest_framework import serializers, status
+from rest_framework import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -20,19 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
         """Create a new user with encrypted password and return it"""
         logger.info('Started email validation for %s...', validated_data.get('email'))
 
-        hunter_url ='https://api.hunter.io/v2/email-verifier?email={}&api_key={}' \
-                     .format(validated_data.get('email'), os.getenv('HUNTER_API_KEY'))
-        r = requests.get(hunter_url)
-
-        if not r.status_code == status.HTTP_200_OK:
-            logger.info('Error while checking email address with external API...')
-            raise serializers.ValidationError({'message': ['Error while confirming email address.']})
-
-        if r.json().get('data').get('status') == 'invalid':
-            logger.info('Supplied email address %s is not a valid one...', validated_data.get('email'))
-            raise serializers.ValidationError({'email': ['This address is not valid.']})
-
-        logger.info('Email validation process completed successfully...')
+        check_email_valid(validated_data.get('email'))
 
         if not validated_data.get('first_name'):
             logger.info('first_name is required...')

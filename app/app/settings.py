@@ -185,3 +185,7 @@ LOGGING = {
         },
     },
 }
+
+CLEARBIT_KEY = os.getenv('CLEARBIT_KEY') if os.getenv('CLEARBIT_KEY') else 'sk_93a7a276b5bedacc517c9a7007815017'
+HUNTER_API_KEY = os.getenv('HUNTER_API_KEY') if os.getenv('HUNTER_API_KEY') else 'b7130e673f91b887a54e1a2a88891702717387ca'
+HUNTER_URL = os.getnenv('HUNTER_URL') if os.getenv('HUNTER_URL') else 'https://api.hunter.io/v2/email-verifier?email='

@@ -1,5 +1,4 @@
-import clearbit
-import logging
+from core.repository import get_clearbit_details
 
 from django.contrib.postgres.fields import JSONField
 
@@ -7,10 +6,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, \
                                        BaseUserManager, \
                                        PermissionsMixin
-
-logger = logging.getLogger(__name__)
-
-clearbit.key = 'sk_93a7a276b5bedacc517c9a7007815017'
 
 
 class UserManager(BaseUserManager):
@@ -21,18 +16,10 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('User must provide email.')
 
-        logger.info('Started getting additional data for user %s...', email)
-
-        response = clearbit.Enrichment.find(email=email, stream=False)
-
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
 
-        if response:
-            logger.info('Fetched data for user %s added to db...', email)
-            user.additional_data = response
-        else:
-            logger.info('Error while fetching data for user %s or data not present...', email)
+        user.additional_data = get_clearbit_details(email)
 
         user.save(using=self._db)
 
