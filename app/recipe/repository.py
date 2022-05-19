@@ -46,7 +46,6 @@ def list_recipes_text_db(text):
 
 def list_recipes_ingredients_db(ingredients):
     logger.info('Filtering recipes by ingredients...')
-
     return Recipe.objects.filter(ingredients__in=ingredients).\
             annotate(num_ingredients=Count('ingredients'))\
             .filter(num_ingredients=len(ingredients))
