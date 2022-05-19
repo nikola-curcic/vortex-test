@@ -9,7 +9,7 @@ Example application for recipe and ingredients
 docker-compose up
 ```
 
-### Rebuild in case necessary:
+### Rebuild in case necessary
 ```
 docker-compose build
 ```
